@@ -1,33 +1,43 @@
-const { poolNotifications } = require('../config/db');
+const { Notification, NotificationPreferences } = require('../models/notifications');
 
-// Fetch all notifications for a user
-const getNotifications = async (req, res) => {
-    const { userId } = req.params;
+// Fetch all notifications
+const getAllNotifications = async (req, res) => {
     try {
-        const result = await poolNotifications.query(
-            'SELECT * FROM notifications WHERE user_id = $1',
-            [userId]
-        );
-        res.json(result.rows);
+        const notifications = await Notification.findAll();
+        res.json(notifications);
     } catch (err) {
-        console.error('Error fetching notifications:', err);
+        console.error('Error fetching notifications: ', err);
         res.status(500).json({ error: 'Failed to fetch notifications' });
     }
 };
 
-// Mark notification as read
-const markAsRead = async (req, res) => {
-    const { notificationId } = req.params;
+// Create a new notification
+const createNotification = async (req, res) => {
     try {
-        await poolNotifications.query(
-            'UPDATE notifications SET status = $1 WHERE notification_id = $2',
-            ['read', notificationId]
-        );
-        res.json({ message: 'Notification marked as read' });
+        const { message, status } = req.body;
+        const notification = await Notification.create({ message, status });
+        res.status(201).json(notification);
     } catch (err) {
-        console.error('Error marking notification as read:', err);
-        res.status(500).json({ error: 'Failed to mark notification as read' });
+        console.error('Error creating notification: ', err);
+        res.status(500).json({ error: 'Failed to create notification' });
     }
 };
 
-module.exports = { getNotifications, markAsRead };
+// Update notification preferences
+const updateNotificationPreferences = async (req, res) => {
+    try {
+        const preferences = await NotificationPreferences.findOne({ where: { userId: req.params.userId } });
+        if (preferences) {
+            const { emailNotifications, pushNotifications } = req.body;
+            await preferences.update({ emailNotifications, pushNotifications });
+            res.json(preferences);
+        } else {
+            res.status(404).json({ error: 'Preferences not found' });
+        }
+    } catch (err) {
+        console.error('Error updating preferences: ', err);
+        res.status(500).json({ error: 'Failed to update preferences' });
+    }
+};
+
+module.exports = { getAllNotifications, createNotification, updateNotificationPreferences };

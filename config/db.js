@@ -1,50 +1,69 @@
-const { Pool } = require('pg');
+const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-const poolUsers = new Pool({
-    user: process.env.DB_USER_USERS,
-    host: process.env.DB_HOST_USERS,
-    database: process.env.DB_NAME_USERS,
-    password: process.env.DB_PASSWORD_USERS,
-    port: process.env.DB_PORT_USERS,
-});
+const sequelizeUsers = new Sequelize(
+    process.env.DB_NAME_USERS,
+    process.env.DB_USER_USERS,
+    process.env.DB_PASSWORD_USERS,
+    {
+        host: process.env.DB_HOST_USERS,
+        dialect: 'postgres',
+        logging: false,  // Optional: Disable SQL logging for cleaner output
+    }
+);
 
-const poolBooks = new Pool({
-    user: process.env.DB_USER_BOOKS,
-    host: process.env.DB_HOST_BOOKS,
-    database: process.env.DB_NAME_BOOKS,
-    password: process.env.DB_PASSWORD_BOOKS,
-    port: process.env.DB_PORT_BOOKS,
-});
+const sequelizeBooks = new Sequelize(
+    process.env.DB_NAME_BOOKS,
+    process.env.DB_USER_BOOKS,
+    process.env.DB_PASSWORD_BOOKS,
+    {
+        host: process.env.DB_HOST_BOOKS,
+        dialect: 'postgres',
+        logging: false,  // Optional: Disable SQL logging for cleaner output
+    }
+);
 
-const poolNotifications = new Pool({
-    user: process.env.DB_USER_NOTIFICATIONS,
-    host: process.env.DB_HOST_NOTIFICATIONS,
-    database: process.env.DB_NAME_NOTIFICATIONS,
-    password: process.env.DB_PASSWORD_NOTIFICATIONS,
-    port: process.env.DB_PORT_NOTIFICATIONS,
-});
+const sequelizeNotifications = new Sequelize(
+    process.env.DB_NAME_NOTIFICATIONS,
+    process.env.DB_USER_NOTIFICATIONS,
+    process.env.DB_PASSWORD_NOTIFICATIONS,
+    {
+        host: process.env.DB_HOST_NOTIFICATIONS,
+        dialect: 'postgres',
+        logging: false,  // Optional: Disable SQL logging for cleaner output
+    }
+);
 
-const poolMessages = new Pool({
-    user: process.env.DB_USER_MESSAGES,
-    host: process.env.DB_HOST_MESSAGES,
-    database: process.env.DB_NAME_MESSAGES,
-    password: process.env.DB_PASSWORD_MESSAGES,
-    port: process.env.DB_PORT_MESSAGES,
-});
+const sequelizeMessages = new Sequelize(
+    process.env.DB_NAME_MESSAGES,
+    process.env.DB_USER_MESSAGES,
+    process.env.DB_PASSWORD_MESSAGES,
+    {
+        host: process.env.DB_HOST_MESSAGES,
+        dialect: 'postgres',
+        logging: false,  // Optional: Disable SQL logging for cleaner output
+    }
+);
 
-const poolRequests = new Pool({
-    user: process.env.DB_USER_REQUESTS,
-    host: process.env.DB_HOST_REQUESTS,
-    database: process.env.DB_NAME_REQUESTS,
-    password: process.env.DB_PASSWORD_REQUESTS,
-    port: process.env.DB_PORT_REQUESTS,
-});
+const sequelizeRequests = new Sequelize(
+    process.env.DB_NAME_REQUESTS,
+    process.env.DB_USER_REQUESTS,
+    process.env.DB_PASSWORD_REQUESTS,
+    {
+        host: process.env.DB_HOST_REQUESTS,
+        dialect: 'postgres',
+        logging: false,  // Optional: Disable SQL logging for cleaner output
+    }
+);
+sequelizeUsers
+    .authenticate()
+    .then(() => console.log('Connected to Users database successfully'))
+    .catch((error) => console.error('Error connecting to Users database:', error));
 
 module.exports = {
-    poolUsers,
-    poolBooks,
-    poolRequests,
-    poolNotifications,
-    poolMessages,
-  };
+    sequelizeUsers,
+    sequelizeBooks,
+    sequelizeRequests,
+    sequelizeNotifications,
+    sequelizeMessages,
+};

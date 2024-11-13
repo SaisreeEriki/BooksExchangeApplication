@@ -1,29 +1,71 @@
-const { poolRequests } = require('../config/db');
+const { BookExchange, RequestsLog } = require('../models/requests');
 
-// Fetch all requests
-const getAllRequests = async (req, res) => {
+// Fetch all book exchanges
+const getAllExchanges = async (req, res) => {
     try {
-        const result = await poolRequests.query('SELECT * FROM book_exchanges');
-        res.json(result.rows);
+        const exchanges = await BookExchange.findAll();
+        res.json(exchanges);
     } catch (err) {
-        console.error('Error fetching requests:', err);
-        res.status(500).json({ error: 'Failed to fetch requests' });
+        console.error('Error fetching exchanges: ', err);
+        res.status(500).json({ error: 'Failed to fetch exchanges' });
     }
 };
 
-// Create a new request
-const createRequest = async (req, res) => {
-    const { book_id, from_user_id, to_user_id, status } = req.body;
+// Create a new book exchange
+const createExchange = async (req, res) => {
     try {
-        const result = await poolRequests.query(
-            'INSERT INTO book_exchanges (book_id, from_user_id, to_user_id, status) VALUES ($1, $2, $3, $4) RETURNING *',
-            [book_id, from_user_id, to_user_id, status || 'pending']
-        );
-        res.status(201).json(result.rows[0]);
+        const { bookId, fromUserId, toUserId, status } = req.body;
+        const exchange = await BookExchange.create({ bookId, fromUserId, toUserId, status });
+        res.status(201).json(exchange);
     } catch (err) {
-        console.error('Error creating request:', err);
-        res.status(500).json({ error: 'Failed to create request' });
+        console.error('Error creating exchange: ', err);
+        res.status(500).json({ error: 'Failed to create exchange' });
     }
 };
 
-module.exports = { getAllRequests, createRequest };
+// Add log to a book exchange
+const addExchangeLog = async (req, res) => {
+    try {
+        const { exchangeId, logMessage } = req.body;
+        const log = await RequestsLog.create({ exchangeId, logMessage });
+        res.status(201).json(log);
+    } catch (err) {
+        console.error('Error adding log: ', err);
+        res.status(500).json({ error: 'Failed to add log' });
+    }
+};
+
+// Update exchange status
+const updateExchangeStatus = async (req, res) => {
+    try {
+        const exchange = await BookExchange.findByPk(req.params.exchangeId);
+        if (exchange) {
+            const { status } = req.body;
+            await exchange.update({ status });
+            res.json(exchange);
+        } else {
+            res.status(404).json({ error: 'Exchange not found' });
+        }
+    } catch (err) {
+        console.error('Error updating exchange: ', err);
+        res.status(500).json({ error: 'Failed to update exchange' });
+    }
+};
+
+// Delete exchange
+const deleteExchange = async (req, res) => {
+    try {
+        const exchange = await BookExchange.findByPk(req.params.exchangeId);
+        if (exchange) {
+            await exchange.destroy();
+            res.status(204).send();
+        } else {
+            res.status(404).json({ error: 'Exchange not found' });
+        }
+    } catch (err) {
+        console.error('Error deleting exchange: ', err);
+        res.status(500).json({ error: 'Failed to delete exchange' });
+    }
+};
+
+module.exports = { getAllExchanges, createExchange, addExchangeLog, updateExchangeStatus, deleteExchange };
