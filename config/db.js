@@ -55,11 +55,11 @@ const sequelizeRequests = new Sequelize(
         logging: false,  // Optional: Disable SQL logging for cleaner output
     }
 );
-sequelizeUsers
+sequelizeRequests
     .authenticate()
-    .then(() => console.log('Connected to Users database successfully'))
-    .catch((error) => console.error('Error connecting to Users database:', error));
-
+    .then(() => console.log('Connected to Requests database successfully'))
+    .catch((error) => console.error('Error connecting to Requests database:', error));
+    
 module.exports = {
     sequelizeUsers,
     sequelizeBooks,

@@ -1,4 +1,16 @@
+const axios = require('axios');
 const { BookDetails, Genre } = require('../models/books');
+
+// Function to validate ownerId by checking Users DB
+const validateUser = async (userId) => {
+  try {
+    const response = await axios.get(`http://localhost:3000/api/BookApplication/userService/users/${userId}`);
+    return response.status === 200; // User exists
+  } catch (err) {
+    console.error('User validation failed', err);
+    return false; // User not found or error occurred
+  }
+};
 
 // Fetch all books
 const getAllBooks = async (req, res) => {
@@ -12,6 +24,16 @@ const getAllBooks = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch books' });
     }
 };
+
+const getAllGenres = async (req, res) => {
+    try {
+      const genres = await Genre.findAll();
+      res.status(200).json(genres);
+    } catch (error) {
+      console.error('Error fetching genres:', error);
+      res.status(500).json({ error: 'Failed to fetch genres' });
+    }
+  };
 
 // Fetch a specific book by ID
 const getBookById = async (req, res) => {
@@ -32,8 +54,15 @@ const getBookById = async (req, res) => {
 
 // Create a new book
 const createBook = async (req, res) => {
+    const { title, author, genreId, description, ownerId, status } = req.body;
+
+    // Validate if ownerId exists in Users DB
+    const isValidUser = await validateUser(ownerId);
+    if (!isValidUser) {
+        return res.status(400).json({ error: 'Invalid user ID' });
+    }
+
     try {
-        const { title, author, genreId, description, ownerId, status } = req.body;
         const book = await BookDetails.create({ title, author, genreId, description, ownerId, status });
         res.status(201).json(book);
     } catch (err) {
@@ -75,4 +104,68 @@ const deleteBook = async (req, res) => {
     }
 };
 
-module.exports = { getAllBooks, getBookById, createBook, updateBook, deleteBook };
+const getGenreById = async (req, res) => {
+    try {
+      const genre = await Genre.findByPk(req.params.id);
+      if (genre) {
+        res.status(200).json(genre);
+      } else {
+        res.status(404).json({ error: 'Genre not found' });
+      }
+    } catch (error) {
+      console.error('Error fetching genre:', error);
+      res.status(500).json({ error: 'Failed to fetch genre' });
+    }
+  };
+
+  const createGenre = async (req, res) => {
+    try {
+        const { genreName } = req.body; // genreName is coming from the request body
+        if (!genreName) {
+            return res.status(400).json({ error: 'Genre name is required' });
+        }
+        const newGenre = await Genre.create({ genreName }); // Pass genreName directly to model field
+        res.status(201).json(newGenre);
+    } catch (error) {
+        console.error('Error creating genre:', error);
+        res.status(500).json({ error: 'Failed to create genre' });
+    }
+};
+
+  const updateGenre = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { genre_name } = req.body;
+  
+      const genre = await Genre.findByPk(id);
+      if (!genre) {
+        return res.status(404).json({ error: 'Genre not found' });
+      }
+  
+      genre.genre_name = genre_name || genre.genre_name;
+      await genre.save();
+      res.status(200).json(genre);
+    } catch (error) {
+      console.error('Error updating genre:', error);
+      res.status(500).json({ error: 'Failed to update genre' });
+    }
+  };
+
+  const deleteGenre = async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      const genre = await Genre.findByPk(id);
+      if (!genre) {
+        return res.status(404).json({ error: 'Genre not found' });
+      }
+  
+      await genre.destroy();
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error deleting genre:', error);
+      res.status(500).json({ error: 'Failed to delete genre' });
+    }
+  };
+
+module.exports = { getAllBooks, getBookById, createBook, updateBook, deleteBook, getAllGenres, getGenreById, createGenre, updateGenre, deleteGenre };

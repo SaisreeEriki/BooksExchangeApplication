@@ -1,9 +1,9 @@
 // models/Review.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../../config/db');
+const { sequelizeBooks } = require('../../config/db');
 const BookDetails = require('./Book'); // Import BookDetails for association
 
-const Review = sequelize.define('Review', {
+const Review = sequelizeBooks.define('Review', {
     reviewId: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,

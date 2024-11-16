@@ -1,9 +1,9 @@
 // models/BookRequests.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../../config/db');
+const { sequelizeBooks } = require('../../config/db');
 const BookDetails = require('./Book'); // Import BookDetails for association
 
-const BookRequests = sequelize.define('BookRequests', {
+const BookRequests = sequelizeBooks.define('BookRequests', {
     requestId: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,

@@ -49,6 +49,16 @@ const User = sequelizeUsers.define('User', {
       key: 'role_id'
     },
     field: 'role_id'
+  },
+  passwordResetToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'password_reset_token'
+  },
+  resetTokenExpiration: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    field: 'password_reset_expires'
   }
 }, {
   tableName: 'user_details', // Ensure the table name matches your PostgreSQL schema

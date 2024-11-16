@@ -61,6 +61,14 @@ const getUserById = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch user' });
     }
 };
+const getUserProfilePic = async (req, res) => {
+    try {
+        res.status(200).json({ imgsrc: 'Nothing' });
+    } catch (err) {
+        console.error('Error fetching user: ', err);
+        res.status(500).json({ error: 'Failed to fetch user' });
+    }
+};
 
 // Create a new user
 async function createUser(req, res) {
@@ -240,4 +248,4 @@ const deleteUserPreferences = async (req, res) => {
     }
 };
 
-module.exports = { userValidationRules, getAllUsers, getUserById, createUser, updateUser, deleteUser, getAllRoles, getRoleById, updateRole, deleteRole, createRole };
+module.exports = { userValidationRules, getUserProfilePic, getAllUsers, getUserById, createUser, updateUser, deleteUser, getAllRoles, getRoleById, updateRole, deleteRole, createRole };

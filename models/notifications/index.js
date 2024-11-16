@@ -1,7 +1,5 @@
-const Notification = require('./Notification');
-const NotificationPreferences = require('./NotificationPreferences');
+const Notification = require('./notification');
 
-// Define associations (if needed)
-// For example, NotificationPreferences could be related to a User model in the Users DB
-
-module.exports = { Notification, NotificationPreferences };
+module.exports = {
+    Notification,
+};
